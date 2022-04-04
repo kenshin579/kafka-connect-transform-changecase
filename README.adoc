@@ -4,8 +4,9 @@
 
 :hardbreaks:
 
-= kafka-connect-custom-smt
+= kafka-connect-transform-changecase
 Venky Narayanan <venkyyraghav@gmail.com>
+Frank Oh <kenshin579@hotmail.com>
 
 == Overview
 Refer https://docs.confluent.io/current/connect/transforms/index.html for Kafka Connect SMT.
