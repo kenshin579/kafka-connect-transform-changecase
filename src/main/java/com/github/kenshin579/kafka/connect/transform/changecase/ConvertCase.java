@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package kafka.connect.smt;
+package com.github.kenshin579.kafka.connect.transform.changecase;
 
 import com.google.common.base.CaseFormat;
 import org.apache.kafka.common.cache.Cache;
@@ -69,7 +69,7 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
     }
 
     private interface ConfigName {
-        String CONVERT_FROM_TO ="convert.from.to";
+        String CONVERT_FROM_TO = "convert.from.to";
         String WHITELIST = "whitelist";
         String BLACKLIST = "blacklist";
         String NOOP = "noop";
@@ -152,7 +152,9 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
         }
 
         String fieldName2Use = convertCase(fieldName); // Use converted field name
-        if (log.isDebugEnabled()) {log.debug("Converted " + fieldName + " to " + fieldName2Use);}
+        if (log.isDebugEnabled()) {
+            log.debug("Converted " + fieldName + " to " + fieldName2Use);
+        }
         return fieldName2Use;
     }
 
@@ -225,20 +227,25 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
      */
     private Map<String, Object> applySchemaless(Map<String, Object> originalValue) {
         final Map<String, Object> updatedValue = new HashMap<>();
+        log.info("originalValue:{}", originalValue);
 
-        originalValue.forEach( (k, v) -> {
+        originalValue.forEach((k, v) -> {
             boolean structField = v instanceof Map || v instanceof List;
-
             String fieldName2Use = convertField(k, structField);
+            log.info("k:{} v:{} fieldName2Use:{} structField:{}", k, v, fieldName2Use, structField);
             if (structField) {
                 if (v instanceof Map) {
                     final Map v1 = applySchemaless((Map) v);
                     updatedValue.put(fieldName2Use, v1);
                 } else {
                     List valueList = new ArrayList();
-                    ((List) v).forEach( e -> {
-                        final Object object = applySchemaless((Map)e);
-                        valueList.add(object);
+                    ((List) v).forEach(e -> {
+                        if (e instanceof Map) {
+                            final Object object = applySchemaless((Map) e);
+                            valueList.add(object);
+                        } else { //string
+                            valueList.add(e);
+                        }
                     });
                     updatedValue.put(fieldName2Use, valueList);
                 }
@@ -273,11 +280,11 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
     /*
         Create updated value based on the converted schema
      */
-    private Struct applyWithSchema (Schema schema, Struct originalValue) {
+    private Struct applyWithSchema(Schema schema, Struct originalValue) {
         final Struct value = new Struct(schema);
         final StringBuilder valuePresent = new StringBuilder("");
 
-        schema.fields().forEach( field -> {
+        schema.fields().forEach(field -> {
             String fieldName = field.name();
             String originalFieldName = reverseConverted(fieldName);
 
@@ -291,7 +298,7 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
                 List originalList = originalValue.getArray(originalFieldName);
                 List valueList = new ArrayList();
                 originalList.forEach(originalElement -> {
-                    final Struct v1Value = applyWithSchema(field.schema().valueSchema(), (Struct)originalElement);
+                    final Struct v1Value = applyWithSchema(field.schema().valueSchema(), (Struct) originalElement);
                     if (v1Value != null) {
                         valuePresent.append("1");
                         valueList.add(v1Value);
@@ -329,7 +336,7 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
             fields = schema.fields();
         }
 
-        fields.forEach( field -> {
+        fields.forEach(field -> {
             final String fieldName = field.name();
             boolean structField = field.schema().type() == Schema.Type.STRUCT || field.schema().type() == Schema.Type.ARRAY;
 
@@ -354,6 +361,7 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
         }
         return builder1.optional().build();
     }
+
     @Override
     public ConfigDef config() {
         return CONFIG_DEF;

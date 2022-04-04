@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.venkyraghav.smt.connect.kafka</groupId>
-    <artifactId>custom-smt</artifactId>
+    <groupId>com.github.kenshin579.kafka.connect.transform.changecase</groupId>
+    <artifactId>kafka-connect-transform-changecase</artifactId>
     <version>0.0.1</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,6 +32,11 @@
             <version>29.0-jre</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
@@ -54,7 +59,7 @@
         </plugins>
     </build>
     <repositories>
-       <repository>
+        <repository>
             <id>confluent</id>
             <url>http://packages.confluent.io/maven/</url>
         </repository>
