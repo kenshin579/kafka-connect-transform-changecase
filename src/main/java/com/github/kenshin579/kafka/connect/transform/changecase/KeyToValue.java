@@ -1,4 +1,4 @@
-package kafka.connect.smt;
+package com.github.kenshin579.kafka.connect.transform.changecase;
 
 import org.apache.kafka.common.cache.Cache;
 import org.apache.kafka.common.cache.LRUCache;

@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package kafka.connect.smt;
+package com.github.kenshin579.kafka.connect.transform.changecase;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -212,6 +214,43 @@ public class ConvertCaseTest {
     }
 
     @Test
+    public void schemalessCamel2SnakeUnderscoreWithArrayOfString() {
+        final Map<String, String> props = new HashMap<>();
+        props.put("convert.from.to", "camel2snakeunderscore");
+
+        xformValue.configure(props);
+
+        final Map<String, Object> value = new HashMap<>();
+        value.put("firstName", "whatever");
+        value.put("addressNumber", 123);
+        value.put("living", Boolean.TRUE);
+        value.put("salary", 100.32);
+
+        List<String> strArr = new ArrayList<>();
+        strArr.add("data-1");
+        strArr.add("data-2");
+        value.put("strList", strArr);
+
+        final SinkRecord record = new SinkRecord("test", 0, null, null, null, value, 0);
+        final SinkRecord transformedRecord = xformValue.apply(record);
+
+        final Map updatedValue = (Map) transformedRecord.value();
+
+        assertEquals(5, updatedValue.size());
+        assertEquals("whatever", updatedValue.get("first_name"));
+        assertEquals(123, updatedValue.get("address_number"));
+        assertEquals(Boolean.TRUE, updatedValue.get("living"));
+        assertEquals(100.32, updatedValue.get("salary"));
+        assertEquals(new ArrayList<String>(){
+            {
+                add("data-1");
+                add("data-2");
+            }
+        }, updatedValue.get("str_list"));
+
+    }
+
+    @Test
     public void schemalessCamel2SnakeHyphen() {
         final Map<String, String> props = new HashMap<>();
         props.put("convert.from.to", "camel2snakehyphen");
@@ -309,6 +348,13 @@ public class ConvertCaseTest {
         repeatedInner.put("repeated_two", "repeatedInner4");
 
         value.put("first_name", "whatever");
+        try {
+            String json = new ObjectMapper().writeValueAsString(value);
+            System.out.println("json " + json);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
 
         final SinkRecord record = new SinkRecord("test", 0, null, null, null, value, 0);
         final SinkRecord transformedRecord = xformValue.apply(record);

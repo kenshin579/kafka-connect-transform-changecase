@@ -1,0 +1,22 @@
+{
+  "living": true,
+  "salary": 100.32,
+  "firstName": "whatever",
+  "innerMap": {
+    "repeatedElement": [
+      {
+        "repeatedOne": "repeatedInner1",
+        "repeatedTwo": "repeatedInner2"
+      },
+      {
+        "repeatedOne": "repeatedInner3",
+        "repeatedTwo": "repeatedInner4"
+      }
+    ],
+    "innerMost": {
+      "mediaType": "TestMediaType"
+    },
+    "displayName": "Test Display"
+  },
+  "addressNumber": 123
+}
