@@ -227,12 +227,10 @@ public abstract class ConvertCase<R extends ConnectRecord<R>> implements Transfo
      */
     private Map<String, Object> applySchemaless(Map<String, Object> originalValue) {
         final Map<String, Object> updatedValue = new HashMap<>();
-        log.info("originalValue:{}", originalValue);
 
         originalValue.forEach((k, v) -> {
             boolean structField = v instanceof Map || v instanceof List;
             String fieldName2Use = convertField(k, structField);
-            log.info("k:{} v:{} fieldName2Use:{} structField:{}", k, v, fieldName2Use, structField);
             if (structField) {
                 if (v instanceof Map) {
                     final Map v1 = applySchemaless((Map) v);
